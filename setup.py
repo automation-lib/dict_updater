@@ -3,7 +3,7 @@ import codecs
 import os
 
 VERSION = '0.0.1'
-DESCRIPTION = 'avi'
+DESCRIPTION = 'Nested Dict Update With operation like insert , deleter , updater ,search '
 LONG_DESCRIPTION = 'Recursive Dict Update with insert , deleter , update option'
 
 # Setting up
