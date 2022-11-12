@@ -14,7 +14,7 @@ pip install dictupdate
 ```
 
 ### Example 
-#### Updating dictionary object 
+#### Updating simple dictionary object 
 ```python
 from dictupdate import DictUpdater
 
@@ -33,16 +33,20 @@ target = {
     }
 }
 
-dict_update = DictUpdater().recursive_dict_updater(
+dict_update = DictUpdater.update(
     data=source,
     update_value=target
 )
 
 print(dict_update)
 ```
-
+#### Output :
 ```
 {'a': {'b': 'existing value updated', 'c': 'new value added'}}
 ```
+
+
+
+
 
 
