@@ -45,7 +45,7 @@ print(dict_update)
 {'a': {'b': 'existing value updated', 'c': 'new value added'}}
 ```
 
-## Updating Recursive dictionary with list object.
+## Updating Recursive dictionary within list object.
 Updating dictionary with listing object which again contain dictionary object, Normal recursive update operation will 
 fail to update these type value because it required extra search layer. To tackle this issue DictUpdater.update have 
 extra parameter which help to identify key and update value .
