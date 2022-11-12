@@ -2,13 +2,13 @@ from setuptools import setup, find_packages
 import codecs
 import os
 
-VERSION = '0.0.1'
+VERSION = '0.0.2'
 DESCRIPTION = 'Nested Dict Update With operation like insert , deleter , updater ,search '
 LONG_DESCRIPTION = 'Recursive Dict Update with insert , deleter , update option'
 
 # Setting up
 setup(
-    name="dict_update",
+    name="dictupdate",
     version=VERSION,
     author="Chetan",
     author_email="chetankolhe72@gmail.com",
