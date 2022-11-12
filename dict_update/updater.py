@@ -69,6 +69,7 @@ TODO: Add key comparison mechanism
 TODO: Add logger dump
 """
 import logging
+from copy import deepcopy
 
 
 class DictUpdater:
@@ -91,7 +92,7 @@ class DictUpdater:
             self.default_operation[new_key] = operation_mapping[each_key]
         # self.default_operation.update(operation_mapping)
 
-    def recursive_dict_updater(
+    def _recursive_dict_updater(
             self,
             data,
             update_value,
@@ -118,7 +119,7 @@ class DictUpdater:
                     continue
 
                 # Update again recursively to validate changes
-                data[key] = self.recursive_dict_updater(
+                data[key] = self._recursive_dict_updater(
                     data=data[key],
                     update_value=each_value,
                     base_path=base_path + separator + str(key))
@@ -138,8 +139,8 @@ class DictUpdater:
             if isinstance(
                     data,
                     list) and len(data) > 0 and not isinstance(
-                    data[0],
-                    dict):
+                data[0],
+                dict):
                 ValueError(
                     f"You try to update not dictionary object : {data} and base path : {base_path}")
 
@@ -209,7 +210,7 @@ class DictUpdater:
             for data_index, data_value in enumerate(data):
                 if search_value == data_value.get(search_key):
                     # data[data_index] = value
-                    data[data_index] = self.recursive_dict_updater(
+                    data[data_index] = self._recursive_dict_updater(
                         data=data[data_index], update_value=value, base_path=base_path)
 
                     if replace_value:
@@ -220,6 +221,15 @@ class DictUpdater:
             if not found:
                 data.append(value)
         return data
+
+    @staticmethod
+    def update(data, update_value, separator="->", operation_mapping=None, data_muted=False):
+
+        if data_muted:
+            data = deepcopy(data)
+
+        update_obj = DictUpdater(operation_mapping=operation_mapping)
+        return update_obj._recursive_dict_updater(data=data, update_value=update_value, separator=separator)
 
 
 if __name__ == '__main__':
@@ -263,10 +273,8 @@ if __name__ == '__main__':
                 "filename": "filename->kunal",
                 "tempurl": "new value"}]}]}
 
-    DictUpdater(
-        operation_mapping=operation_mapping_value).recursive_dict_updater(
-        data=value_1,
-        update_value=update_value_required)
+    DictUpdater.update(data=value_1, update_value=update_value_required)
+
     from pprint import pprint
 
     pprint(value_1)
@@ -280,10 +288,11 @@ if __name__ == '__main__':
                 "filename": "filename2->new demo",
                 "tempurl": "new value"}]}]}
 
-    DictUpdater(
-        operation_mapping=operation_mapping_value).recursive_dict_updater(
+    DictUpdater.update(
         data=value_1,
-        update_value=update_value_required)
+        update_value=update_value_required,
+        operation_mapping=operation_mapping_value
+    )
     from pprint import pprint
 
     pprint(value_1)
