@@ -2,12 +2,14 @@ from setuptools import setup, find_packages
 import codecs
 import os
 
-VERSION = '0.0.2'
+VERSION = '0.0.3'
 DESCRIPTION = 'Nested Dict Update With operation like insert , deleter , updater ,search '
-LONG_DESCRIPTION = 'Recursive Dict Update with insert , deleter , update option'
+
+LONG_DESCRIPTION = open("README.md").read()
 
 # Setting up
 setup(
+
     name="dictupdate",
     version=VERSION,
     author="Chetan",
@@ -17,7 +19,8 @@ setup(
     long_description=LONG_DESCRIPTION,
     packages=find_packages(),
     install_requires=[],
-    keywords=['dict updater', 'json update', 'recursive dict updater', 'recursive json updater', 'dict updater','nested dicts'],
+    keywords=['dict updater', 'json update', 'recursive dict updater', 'recursive json updater', 'dict updater',
+              'nested dicts'],
     classifiers=[
         "Development Status :: 1 - Planning",
         "Intended Audience :: Developers",
@@ -27,5 +30,6 @@ setup(
         "Operating System :: Microsoft :: Windows",
     ],
     fullname="Chetan Kolhe",
-    url="https://github.com/automation-lib/dict_updater"
+    url="https://github.com/automation-lib/dict_updater",
+
 )
