@@ -65,50 +65,44 @@ sample.py
     # For delete and append operation , replace metafilesList->metafileobjectsList , operation : append or delete
 
 
-TODO: Add key comparison mechanism
-TODO: Add logger dump
 """
 import logging
 from copy import deepcopy
+
+_supported_operation = {"update", "append", "delete", "update_append"}
 
 
 class DictUpdater:
     class Operation:
         UPDATE = "update"
+        UPDATE_APPEND = "update_append"
         APPEND = "append"
         DELETE = "delete"
 
-    def __init__(self, operation_mapping=None):
+    def __init__(self, operation_mapping=None, seperator="->", opr_sep="::"):
 
         self._logger = logging.getLogger(__name__)
+        self._opr_sep = opr_sep
+        self._seperator = seperator
 
         if operation_mapping is None:
             operation_mapping = {}
-        self.default_operation = {
-        }
-
-        for each_key in operation_mapping:
-            new_key = each_key.replace("->", ".")
-            self.default_operation[new_key] = operation_mapping[each_key]
-        # self.default_operation.update(operation_mapping)
+        self.default_operation = operation_mapping
 
     def _recursive_dict_updater(
             self,
             data,
             update_value,
-            base_path="",
-            separator="->"):
-        """It update exiting data with update value ,
+            base_path=""):
+        """It updates exiting data with update value ,
 
         @param data: Dictionary data which need to updated
         @param update_value: Value through which dictionary data get updated .
         @param base_path: It required to check mapping for operation.
-        @param separator: It is used to pass custom seperator
         @return:
         """
         self._logger.info(base_path)
-        base_path = base_path.strip(separator)
-        base_path = base_path.replace(separator, ".")
+        base_path = base_path.strip(self._seperator)
 
         if isinstance(update_value, dict):
             for key, each_value in update_value.items():
@@ -122,7 +116,7 @@ class DictUpdater:
                 data[key] = self._recursive_dict_updater(
                     data=data[key],
                     update_value=each_value,
-                    base_path=base_path + separator + str(key))
+                    base_path=base_path + self._seperator + str(key))
 
             # Return the update data dict
             return data
@@ -136,13 +130,9 @@ class DictUpdater:
             if isinstance(data, list) and len(data) < 0:
                 return update_value
 
-            if isinstance(
-                    data,
-                    list) and len(data) > 0 and not isinstance(
-                data[0],
-                dict):
+            if isinstance(data, list) and len(data) > 0 and not isinstance(data[0], dict):
                 ValueError(
-                    f"You try to update not dictionary object : {data} and base path : {base_path}")
+                    f"You try to update non dictionary object : {data} and base path : {base_path}")
 
             # Check already specified operation define for search
             operation = self.default_operation.get(base_path)
@@ -151,7 +141,8 @@ class DictUpdater:
             if not operation:
                 return update_value
 
-            if operation["operation"] == DictUpdater.Operation.UPDATE:
+            if operation["operation"] == DictUpdater.Operation.UPDATE \
+                    or operation["operation"] == DictUpdater.Operation.UPDATE_APPEND:
                 search_key = operation.get("key")
 
                 if search_key is None:
@@ -193,16 +184,16 @@ class DictUpdater:
 
     def _update_operation(self, base_path, data, search_key, update_value):
         # search if it is present else append
+        operation = self.default_operation.get(base_path)
         for index, value in enumerate(update_value):
             search_value = value.get(search_key)
             if search_value is None:
-                print("search criteria not define so appending as it is")
                 data.append(value)
                 continue
 
             replace_value = None
-            if "->" in search_value:
-                split_result = search_value.split("->")
+            if type(search_value) == str and self._seperator in search_value:
+                split_result = search_value.split(self._seperator)
                 search_value = split_result[0]
                 replace_value = split_result[-1]
 
@@ -219,17 +210,41 @@ class DictUpdater:
                     found = True
 
             if not found:
-                data.append(value)
+                if operation["operation"] == DictUpdater.Operation.UPDATE_APPEND:
+                    data.append(value)
+                # data.append(value)
         return data
 
     @staticmethod
-    def update(data, update_value, separator="->", operation_mapping=None, data_muted=False):
+    def update(data, update_value, operation_mapping=None, separator="->", opr_sep="::", data_muted=True):
 
-        if data_muted:
+        if not data_muted:
             data = deepcopy(data)
 
-        update_obj = DictUpdater(operation_mapping=operation_mapping)
-        return update_obj._recursive_dict_updater(data=data, update_value=update_value, separator=separator)
+        update_obj = DictUpdater(operation_mapping=operation_mapping, seperator=separator, opr_sep=opr_sep)
+        update_obj._generate_valid_search_mapping(deepcopy(operation_mapping))
+        return update_obj._recursive_dict_updater(data=data, update_value=update_value)
+
+    def _generate_valid_search_mapping(self, search_mapping: dict):
+        key: str
+        for key, value in search_mapping.items():
+
+            if self._opr_sep in key:
+                separate_val = key.rsplit(self._opr_sep)
+                new_key = separate_val[0]
+                operation = separate_val[1]
+
+                if operation.lower() not in _supported_operation:
+                    raise ValueError("Mapping operation not proper , "
+                                     "It support these operation only :{} ".format(_supported_operation))
+
+                del self.default_operation[key]
+                self.default_operation[new_key] = {"operation": operation,
+                                                   "key": value
+                                                   }
+            else:
+                if not (type(value) == dict):
+                    raise ValueError(f"Operation Mapping value not proper , key : {key}, value : {value}")
 
 
 if __name__ == '__main__':

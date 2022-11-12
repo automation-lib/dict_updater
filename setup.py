@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 import codecs
 import os
 
-VERSION = '0.0.3'
+VERSION = '0.0.4'
 DESCRIPTION = 'Nested Dict Update With operation like insert , deleter , updater ,search '
 
 LONG_DESCRIPTION = open("README.md").read()
