@@ -36,7 +36,7 @@ pp(source)
 
 new_value = DictUpdater.update(data=source, update_value=update_value, operation_mapping={
     "a::update_append": "search",
-    "a->b::append": "c"
+    "a->b::append": ""
 }, data_muted=False)
 
 print("-------------- After Update --------------")

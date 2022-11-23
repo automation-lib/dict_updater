@@ -5,27 +5,26 @@ source = {
     "a": [
         {
             "search": 2,
-            "b": [
-                  {
+            "b": {
                       "c": "required_to_update",
                       "value": "target"
-                  },
-                  {},
-                  {}
-                  ]
+                  }
+
+
         },
-        {
-            "search": 1,
-            "b": [
-                  {
-                      "c": "required_to_update_1",
-                      "value": "target",
-                      "value_2": "target"
-                  },
-                  {},
-                  {}
-                  ]
-        }
+        # {
+        #     "search": 2,
+        #     "b": [
+        #           {
+        #               "c": "required_to_update_1",
+        #               "value": "target",
+        #               "value_2": "target"
+        #           },
+        #           {},
+        #           {}
+        #           ]
+        # },
+        # []
     ]
 }
 
@@ -35,7 +34,7 @@ update_value = {
             "search": 1,
             "b": [
                 {
-                    "c": "required_to_update_1",
+                    "c": "required_to_update",
                     "value": "new_value"
                 }
             ]
@@ -47,7 +46,7 @@ pp(source)
 
 new_value = DictUpdater.update(data=source, update_value=update_value, operation_mapping={
     # "a::update": "search",
-    "a->b::delete": "c"
+    "a->b::update": "c"
 }, data_muted=False, path_check_only=True)
 
 print("-------------- After Update --------------")
